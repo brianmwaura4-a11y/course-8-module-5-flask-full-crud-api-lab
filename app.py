@@ -48,23 +48,24 @@ def update_event(id):
     
     # If no title field, leave unchanged
     if data and 'title' in data:
-        if not data['title'].strip():
-            return jsonify({"error": "Title cannot be empty"}), 400
-        event.title = data['title'].strip()
-    
+        title = data['title']
+
+    if not isinstance(title, str) or not title.strip():
+        return jsonify({"error": "Title cannot be empty"}), 400
+
+    event.title = title.strip()  
     return jsonify(event.to_dict()), 200
 
 # DELETE /events/<id> - Remove an event from the list
 @app.route('/events/<int:id>', methods=['DELETE'])
 def delete_event(id):
-    global events
     event = find_event(id)
-    
+
     if not event:
         return jsonify({"error": "Event not found"}), 404
-    
-    events = [e for e in events if e.id != id]
-    
+
+    events.remove(event)
+
     return jsonify({"message": f"Event {id} deleted"}), 200
 
 if __name__ == "__main__":
